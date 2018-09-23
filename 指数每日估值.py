@@ -31,6 +31,7 @@ def parse_dj(text):
         '{"id":\d+,"index_code":"(.*?)","name":"(.*?)","pe":(.*?),"pb":(.*?),"pe_percentile":(.*?),"pb_percentile":(.*?),"roe":(.*?),"yeild":(.*?),"ts.*?eva_type":"(.*?)".*?}', re.S)
     results = re.findall(pattern, text)
     list_dj = []
+    list_ep = ['中证红利','50AH优选','基本面50','央视50','上证50','国企指数','恒生指数']
     for result in results:
         eval_dict = {}
         eval_dict['index_code'] = result[0]
@@ -44,6 +45,8 @@ def parse_dj(text):
         eval_dict['roe'] = str(round(float(result[6]) * 100, 2)) + '%'
         eval_dict['yeild'] = str(round(float(result[7]) * 100, 2)) + '%'
         eval_dict['type'] = result[8]
+        if eval_dict['name'] in list_ep:
+            eval_dict['e/p'] = str(round((1 / float(result[2])) * 100,2)) + '%'
         list_dj.append(eval_dict)
 
     return list_dj
@@ -118,7 +121,7 @@ def join_dict(list_main, list_sec):
 
 
 def save_tocsv(data, path):
-    columns = ['index_code', 'name', 'pe',
+    columns = ['index_code', 'name', 'e/p','pe',
                'pe_percentile', 'pb', 'pb_percentile', 'yeild', 'roe', 'pe/pb', 'percent_qm', 'max', 'min', 'rank_qm', 'roe_qm',
                'type', 'type_qm']
     df = pd.DataFrame(data)
